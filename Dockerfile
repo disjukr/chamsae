@@ -3,8 +3,10 @@ EXPOSE 8001
 WORKDIR /app
 USER deno
 
-COPY deno.jsonc .
-COPY gameserver .
+COPY deno.jsonc deno.jsonc
+COPY gameserver gameserver/
+COPY shared shared/
+
 RUN deno cache gameserver/main.ts
 
 CMD ["task", "gameserver"]
