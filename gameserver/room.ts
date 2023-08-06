@@ -1,0 +1,1 @@
+const atoz = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

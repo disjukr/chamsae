@@ -1,0 +1,6 @@
+{
+  "lock": false,
+  "tasks": {
+    "gameserver": "deno run -A --unstable ./gameserver/main.ts"
+  }
+}
