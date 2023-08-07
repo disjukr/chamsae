@@ -1,6 +1,7 @@
 import { nanoid } from "https://deno.land/x/nanoid@v3.0.0/mod.ts";
 import { ServerMessage } from "../../shared/message/server.ts";
 import { disconnect, revive } from "./keep.ts";
+import { Model } from "../../shared/model.ts";
 
 export interface ReconnectionInfo {
   connId: string;
@@ -34,7 +35,7 @@ export class ReconnectionError extends Error {}
 
 export type Store = Record<string, any>;
 
-export function send(socket: WebSocket, message: ServerMessage) {
+export function send(socket: WebSocket, message: Model<typeof ServerMessage>) {
   socket.send(JSON.stringify(message));
 }
 
