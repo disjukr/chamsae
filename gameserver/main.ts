@@ -1,4 +1,7 @@
+import { ClientMessage } from "../shared/message/client.ts";
 import { connect, ReconnectionInfo, send } from "./connection/mod.ts";
+import handlers, { Handler } from "./handlers.ts";
+import { getUser } from "./user.ts";
 
 Deno.serve({ port: 8001 }, async (req) => {
   if (req.headers.get("upgrade") != "websocket") {
@@ -10,13 +13,19 @@ Deno.serve({ port: 8001 }, async (req) => {
     socket,
     reconnect: getReconnectionInfo(url),
   });
-  send(socket, { t: "hello", connId, secret });
+  send(socket, { t: "hello", connId, secret, me: getUser(connId)! });
   socket.addEventListener("message", (e) => {
-    if (e.data === "ping") {
-      socket.send("pong");
+    const clientMessage = JSON.parse(e.data);
+    if (!ClientMessage.validate(clientMessage)) {
+      throw new Error(`Invalid client message: ${e.data}`);
     }
+    (handlers[clientMessage.t] as Handler)(clientMessage, socket);
   });
   return response;
+});
+
+globalThis.addEventListener("unhandledrejection", (e) => {
+  if (e.reason instanceof Error) console.log(e.reason.stack);
 });
 
 function getReconnectionInfo(url: URL): ReconnectionInfo | undefined {
