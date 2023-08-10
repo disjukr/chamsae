@@ -1,0 +1,25 @@
+{
+  "folders": [
+    {
+      "name": "Chamsae Root",
+      "path": "."
+    },
+    {
+      "name": "Chamsae Shared Model & Logic",
+      "path": "./shared"
+    },
+    {
+      "name": "Chamsae Gameserver",
+      "path": "./gameserver"
+    },
+    {
+      "name": "Chamsae Web",
+      "path": "./web"
+    }
+  ],
+  "settings": {
+    "deno.enable": true,
+    "deno.lint": false,
+    "deno.unstable": true
+  }
+}

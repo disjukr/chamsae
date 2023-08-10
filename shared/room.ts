@@ -5,7 +5,7 @@ export const Role = model(
   Type.Union([Type.Literal("player"), Type.Literal("viewer")]),
 );
 
-export const User = model(
+export const RoomUser = model(
   Type.Object({
     connId: Type.String(),
     role: Role.schema,
@@ -14,6 +14,6 @@ export const User = model(
 
 export const Room = model(
   Type.Object({
-    users: Type.Array(User.schema),
+    users: Type.Array(RoomUser.schema),
   }),
 );

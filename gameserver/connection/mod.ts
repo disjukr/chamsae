@@ -39,7 +39,7 @@ export function send(socket: WebSocket, message: Model<typeof ServerMessage>) {
   socket.send(JSON.stringify(message));
 }
 
-export function getId(socket: WebSocket): string | undefined {
+export function getConnId(socket: WebSocket): string | undefined {
   return socket2id.get(socket);
 }
 
