@@ -10,18 +10,18 @@ export function on(handler: Handler): Off {
   return () => handlers.delete(handler);
 }
 
-const handlers = new Set<Handler>();
-
 export const socketSignal = signal<WebSocket | undefined>(undefined);
+
+const handlers = new Set<Handler>();
+const handleEvent = (e: MessageEvent) => {
+  const data = JSON.parse(e.data) as Model<typeof ServerMessage>;
+  Object.freeze(data);
+  for (const handler of handlers) handler(data);
+};
 
 effect(() => {
   const socket = socketSignal.value;
   if (!socket) return;
-  const handleEvent = (e: MessageEvent) => {
-    const data = JSON.parse(e.data) as Model<typeof ServerMessage>;
-    Object.freeze(data);
-    for (const handler of handlers) handler(data);
-  };
   socket.addEventListener("message", handleEvent);
   return () => socket.removeEventListener("message", handleEvent);
 });
