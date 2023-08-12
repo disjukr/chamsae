@@ -19,7 +19,7 @@ Deno.serve({ port: 8001 }, async (req) => {
     if (!ClientMessage.validate(clientMessage)) {
       throw new Error(`Invalid client message: ${e.data}`);
     }
-    (handlers[clientMessage.t] as Handler)(clientMessage, socket);
+    (handlers[clientMessage.t] as Handler)(clientMessage, { socket, connId });
   });
   return response;
 });

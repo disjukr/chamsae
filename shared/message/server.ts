@@ -18,9 +18,9 @@ export const Hello = model(
   }),
 );
 
-export const NicknameChanged = model(
+export const NicknameUpdated = model(
   Type.Object({
-    t: Type.Literal("nickname-changed"),
+    t: Type.Literal("nickname-updated"),
     connId: Type.String(),
     nickname: Type.String(),
   }),
@@ -63,13 +63,21 @@ export const UserJoinedToRoom = model(
   }),
 );
 
+export const UserLeftFromRoom = model(
+  Type.Object({
+    t: Type.Literal("user-left-from-room"),
+    connId: Type.String(),
+  }),
+);
+
 export const ServerMessage = model(
   Type.Union([
     Noop.schema,
     Hello.schema,
-    NicknameChanged.schema,
+    NicknameUpdated.schema,
     CreateRoomResponse.schema,
     JoinRoomResponse.schema,
     UserJoinedToRoom.schema,
+    UserLeftFromRoom.schema,
   ], { discriminator: { propertyName: "t" } }),
 );

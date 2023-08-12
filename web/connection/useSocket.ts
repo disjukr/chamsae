@@ -1,16 +1,24 @@
 import { useEffect } from "preact/hooks";
+import useHandlers from "./useHandlers.ts";
 
 export default function useSocket(
-  url: string,
+  host: string,
   onOpen: (socket: WebSocket) => void,
   onClose: () => void,
 ) {
+  const url = new URL(host);
+  useHandlers({
+    "hello"({ connId, secret }) {
+      url.searchParams.set("connId", connId);
+      url.searchParams.set("secret", secret);
+    },
+  });
   useEffect(() => {
     let s: WebSocket | undefined;
     let loop = true;
     (async () => {
       while (loop) {
-        const { socket, opened, closed } = connect(url);
+        const { socket, opened, closed } = connect(String(url));
         s = socket;
         await Promise.any([
           opened.then(() => onOpen(socket)),

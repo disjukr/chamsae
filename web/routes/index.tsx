@@ -6,7 +6,7 @@ export default function Page() {
   return (
     <>
       <Head>
-        <title>참새</title>
+        <title>𓅪</title>
       </Head>
       <Game gameserver={gameserver} />
     </>

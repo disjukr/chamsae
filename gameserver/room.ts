@@ -5,6 +5,11 @@ import { Room, RoomUser } from "../shared/room.ts";
 import { getSocket, send } from "./connection/mod.ts";
 
 const rooms = new Map<string, Model<typeof Room>>();
+const connid2roomid = new Map<string, string>();
+
+export function whichRoom(connId: string): string | undefined {
+  return connid2roomid.get(connId);
+}
 
 export interface CreateRoomResult {
   roomId: string;
@@ -16,6 +21,7 @@ export function createRoom(connId: string): CreateRoomResult {
     users: [{ connId, role: "player" }],
   };
   rooms.set(roomId, room);
+  connid2roomid.set(connId, roomId);
   return { roomId, room };
 }
 
@@ -32,9 +38,24 @@ export function joinRoom(connId: string, roomId: string): JoinRoomResult {
   const room = rooms.get(roomId);
   if (!room) return { success: false, reason: "not-found" };
   const roomUser: Model<typeof RoomUser> = { connId, role: "player" };
-  room.users.push(roomUser);
   broadcast(roomId, { t: "user-joined-to-room", roomUser });
+  connid2roomid.set(connId, roomId);
+  room.users.push(roomUser);
   return { success: true, room };
+}
+
+export function leaveRoom(connId: string, roomId: string): void {
+  const room = rooms.get(roomId);
+  if (!room) return;
+  const userIdx = room.users.findIndex((user) => user.connId === connId);
+  if (userIdx < 0) return;
+  connid2roomid.delete(connId);
+  room.users.splice(userIdx, 1);
+  if (room.users.length) {
+    broadcast(roomId, { t: "user-left-from-room", connId });
+  } else {
+    rooms.delete(roomId);
+  }
 }
 
 export function broadcast(
