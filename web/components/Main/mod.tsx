@@ -1,24 +1,11 @@
-import useHandlers from "../../connection/useHandlers.ts";
-import { myConnIdSignal, usersSignal } from "../../state/users.ts";
-import ConnectionInfo from "./ConnectionInfo.tsx";
+import { nicknameSignal } from "../../state/users.ts";
 
 export default function Main() {
-  useHandlers({
-    "hello"({ me }) {
-      const myConnId = me.connId;
-      myConnIdSignal.value = myConnId;
-      usersSignal.value = { ...usersSignal.value, [myConnId]: me };
-    },
-    "nickname-updated"({ connId, nickname }) {
-      const user = usersSignal.value[connId];
-      if (!user) return;
-      usersSignal.value = { [connId]: { ...user, nickname } };
-    },
-  });
   return (
     <div class="w-full h-full flex flex-col gap-4 items-center justify-center">
-      <div class="absolute top-0 right-0 px-1">
-        <ConnectionInfo />
+      <div class="absolute top-0 left-0 px-1">
+        <span class="px-1 rounded bg-[rgb(226,232,240)]">{nicknameSignal}
+        </span>님 안녕하세요!
       </div>
       <h1 class="text-center text-5xl font-bold">𓅪</h1>
       <div class="inline-flex flex-col gap-2">

@@ -1,4 +1,4 @@
 import { signal } from "@preact/signals";
 
-export type Screen = "fail" | "main";
-export const screenSignal = signal<Screen>("main");
+export type Screen = "fail" | "setup" | "main";
+export const screenSignal = signal<Screen>("setup");
