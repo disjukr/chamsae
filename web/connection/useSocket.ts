@@ -1,10 +1,12 @@
 import { useEffect } from "preact/hooks";
+import { wait } from "shared/misc/async.ts";
 import useHandlers from "./useHandlers.ts";
 
 export default function useSocket(
   host: string,
   onOpen: (socket: WebSocket) => void,
   onClose: () => void,
+  onFail: () => void,
 ) {
   const url = new URL(host);
   useHandlers({
@@ -16,23 +18,33 @@ export default function useSocket(
   useEffect(() => {
     let s: WebSocket | undefined;
     let loop = true;
+    let failCount = 0;
     (async () => {
       while (loop) {
         const { socket, opened, closed } = connect(String(url));
         s = socket;
         await Promise.any([
-          opened.then(() => onOpen(socket)),
+          opened.then(() => {
+            failCount = 0;
+            onOpen(socket);
+          }),
           closed,
         ]);
         await closed;
         onClose();
+        if (++failCount > 5) {
+          onFail();
+          break;
+        } else {
+          await wait((500 + 500 * Math.random()) * failCount);
+        }
       }
     })();
     return () => {
       loop = false;
       s?.close();
     };
-  }, [url]);
+  }, [host]);
 }
 
 export interface ConnectResult {

@@ -1,6 +1,6 @@
 import { Head } from "$fresh/runtime.ts";
 import { gameserver } from "../config/gameserver.ts";
-import Game from "../islands/Game.tsx";
+import Root from "../islands/Root.tsx";
 
 export default function Page() {
   return (
@@ -8,7 +8,7 @@ export default function Page() {
       <Head>
         <title>𓅪</title>
       </Head>
-      <Game gameserver={gameserver} />
+      <Root gameserver={gameserver} />
     </>
   );
 }
