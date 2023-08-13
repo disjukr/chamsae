@@ -9,4 +9,4 @@ COPY shared shared/
 
 RUN deno cache gameserver/main.ts
 
-CMD ["task", "gameserver"]
+CMD ["task", "gameserver:start"]

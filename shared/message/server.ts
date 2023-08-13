@@ -1,7 +1,7 @@
 import { Type } from "npm:@sinclair/typebox";
 import model from "../model.ts";
 import { User } from "../user.ts";
-import { JoinRoomResult, Room, RoomUser } from "../room.ts";
+import { CreateRoomResult, JoinRoomResult, Room, RoomUser } from "../room.ts";
 
 export const Noop = model(
   Type.Object({
@@ -30,10 +30,7 @@ export const CreateRoomResponse = model(
   Type.Object({
     t: Type.Literal("create-room-response"),
     requestId: Type.String(),
-    result: Type.Object({
-      roomId: Type.String(),
-      room: Room.schema,
-    }),
+    result: CreateRoomResult.schema,
   }),
 );
 

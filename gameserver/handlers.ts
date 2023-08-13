@@ -21,8 +21,8 @@ export type Handler = (
 ) => void;
 
 const handlers: Handlers = {
-  "noop": () => {},
-  "change-nickname": ({ nickname }, { socket, connId }) => {
+  "noop"() {},
+  "change-nickname"({ nickname }, { socket, connId }) {
     const store = getStore(socket)!;
     store.nickname = nickname;
     const roomId = whichRoom(connId);
@@ -32,21 +32,21 @@ const handlers: Handlers = {
       send(socket, { t: "nickname-changed", connId, nickname });
     }
   },
-  "create-room-request": ({ requestId }, { socket, connId }) => {
+  "create-room-request"({ requestId }, { socket, connId }) {
     send(socket, {
       t: "create-room-response",
       requestId,
       result: createRoom(connId),
     });
   },
-  "join-room-request": ({ requestId, roomId }, { socket, connId }) => {
+  "join-room-request"({ requestId, roomId }, { socket, connId }) {
     send(socket, {
       t: "join-room-response",
       requestId,
       result: joinRoom(connId, roomId),
     });
   },
-  "ready": ({ ready }, { connId }) => {
+  "ready"({ ready }, { connId }) {
     const roomId = whichRoom(connId);
     if (!roomId) return;
     const room = getRoom(roomId)!;

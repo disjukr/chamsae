@@ -1,6 +1,9 @@
 {
   "lock": false,
   "tasks": {
-    "gameserver": "deno run -A --unstable ./gameserver/main.ts"
+    "gameserver:dev": "cd gameserver && deno task dev",
+    "gameserver:debug": "cd gameserver && deno task debug",
+    "gameserver:start": "cd gameserver && deno task start",
+    "web:dev": "cd web && deno task dev"
   }
 }
