@@ -7,6 +7,7 @@ import {
 } from "../../state/users.ts";
 import { screenSignal } from "../../state/screen.ts";
 import useHandlers from "../../connection/useHandlers.ts";
+import { triggerFullscreen } from "../../misc/fullscreen.ts";
 
 export default function Setup() {
   const connectingSignal = useSignal(true);
@@ -46,6 +47,7 @@ function UpdateNickname() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
+            navigator.maxTouchPoints && triggerFullscreen();
             send({ t: "update-nickname", nickname: newNicknameSignal.value });
           }}
         >

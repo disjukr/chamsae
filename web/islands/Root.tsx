@@ -1,8 +1,10 @@
 import Fail from "../components/Fail/mod.tsx";
 import Main from "../components/Main/mod.tsx";
+import Room from "../components/Room/mod.tsx";
 import Setup from "../components/Setup/mod.tsx";
 import { socketSignal } from "../connection/mod.ts";
 import useSocket from "../connection/useSocket.ts";
+import { triggerFullscreen } from "../misc/fullscreen.ts";
 import { Screen, screenSignal } from "../state/screen.ts";
 
 export interface RootProps {
@@ -22,7 +24,7 @@ export default function Root({ gameserver }: RootProps) {
   return (
     <div
       class="absolute inset-0 overflow-hidden"
-      onTouchEndCapture={triggerFullscreen}
+      onTouchEndCapture={screen !== "setup" ? triggerFullscreen : undefined}
     >
       {screens[screen]}
     </div>
@@ -32,13 +34,6 @@ export default function Root({ gameserver }: RootProps) {
 const screens: { [type in Screen]: any } = {
   "fail": <Fail />,
   "main": <Main />,
+  "room": <Room />,
   "setup": <Setup />,
 };
-
-async function triggerFullscreen() {
-  if (document.fullscreenElement) return;
-  await document.documentElement.requestFullscreen({
-    navigationUI: "hide",
-  });
-  window.screen.orientation.lock("landscape");
-}
