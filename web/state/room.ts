@@ -1,6 +1,6 @@
 import { computed, signal } from "@preact/signals";
 import type { Model } from "shared/model.ts";
-import { Room, RoomUser, WaitingPhase } from "shared/room.ts";
+import type { Room, RoomUser, WaitingPhase } from "shared/room.ts";
 import { usersSignal } from "./users.ts";
 
 export const roomIdSignal = signal("");
