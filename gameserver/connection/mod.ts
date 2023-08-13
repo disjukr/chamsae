@@ -1,6 +1,6 @@
 import { nanoid } from "https://deno.land/x/nanoid@v3.0.0/mod.ts";
 import { ServerMessage } from "../../shared/message/server.ts";
-import { disconnect, revive } from "./keep.ts";
+import { disconnect, getGrave, revive } from "./keep.ts";
 import { Model } from "../../shared/model.ts";
 
 export interface ReconnectionInfo {
@@ -47,12 +47,12 @@ export function getSocket(connId: string): WebSocket | undefined {
   return id2socket.get(connId);
 }
 
-export function getStore(
-  connIdOrSocket: string | WebSocket,
-): Store | undefined {
-  const socket = typeof connIdOrSocket === "string"
-    ? getSocket(connIdOrSocket)
-    : connIdOrSocket;
+export function getStore(connId: string): Store | undefined {
+  const socket = getSocket(connId);
+  return socket ? getStoreBySocket(socket) : getGrave(connId)?.store;
+}
+
+export function getStoreBySocket(socket: WebSocket): Store | undefined {
   return socket && socket2store.get(socket);
 }
 

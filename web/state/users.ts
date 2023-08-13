@@ -6,6 +6,11 @@ export interface Users {
   [connId: string]: Model<typeof User>;
 }
 export const usersSignal = signal<Users>({});
+export function updateUsers(users: Model<typeof User>[]): void {
+  const newUsers: Users = { ...usersSignal.value };
+  for (const user of users) newUsers[user.connId] = user;
+  usersSignal.value = newUsers;
+}
 
 export const myConnIdSignal = signal("");
 

@@ -50,6 +50,7 @@ export const CreateRoomResult = model(
 export const JoinRoomSuccess = model(
   Type.Object({
     success: Type.Literal(true),
+    roomId: Type.String(),
     room: Room.schema,
     users: Type.Array(User.schema),
   }),

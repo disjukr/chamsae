@@ -23,7 +23,7 @@ export type Handler = (
 const handlers: Handlers = {
   "noop"() {},
   "change-nickname"({ nickname }, { socket, connId }) {
-    const store = getStore(socket)!;
+    const store = getStore(connId)!;
     store.nickname = nickname;
     const roomId = whichRoom(connId);
     if (roomId) {

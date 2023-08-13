@@ -48,11 +48,12 @@ export function joinRoom(
   if (!room) return { success: false, reason: "not-found" };
   if (room.users.length >= 5) return { success: false, reason: "no-seats" };
   const roomUser: Model<typeof RoomUser> = { connId };
-  broadcast(roomId, { t: "user-joined-to-room", roomUser });
+  const user = getUser(connId)!;
+  broadcast(roomId, { t: "user-joined-to-room", user, roomUser });
   connid2roomid.set(connId, roomId);
   room.users.push(roomUser);
   const users = room.users.map(({ connId }) => getUser(connId)!);
-  return { success: true, room, users };
+  return { success: true, roomId, room, users };
 }
 
 export function leaveRoom(connId: string, roomId: string): void {
