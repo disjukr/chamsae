@@ -1,6 +1,6 @@
 import { computed, signal } from "@preact/signals";
-import { Model } from "shared/model.ts";
-import { User } from "shared/user.ts";
+import type { Model } from "shared/model.ts";
+import type { User } from "shared/user.ts";
 
 export interface Users {
   [connId: string]: Model<typeof User>;

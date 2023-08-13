@@ -1,6 +1,6 @@
 import { useEffect } from "preact/hooks";
-import { Model } from "shared/model.ts";
-import { ServerMessage } from "shared/message/server.ts";
+import type { Model } from "shared/model.ts";
+import type { ServerMessage } from "shared/message/server.ts";
 import { on } from "./mod.ts";
 
 export default function useHandlers(handlers: Partial<Handlers>) {

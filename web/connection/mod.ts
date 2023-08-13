@@ -1,7 +1,7 @@
 import { effect, signal } from "@preact/signals";
-import { ClientMessage } from "../../shared/message/client.ts";
-import { ServerMessage } from "../../shared/message/server.ts";
-import { Model } from "../../shared/model.ts";
+import type { ClientMessage } from "../../shared/message/client.ts";
+import type { ServerMessage } from "../../shared/message/server.ts";
+import type { Model } from "../../shared/model.ts";
 
 export type Handler = (message: Model<typeof ServerMessage>) => void;
 export type Off = () => void;
