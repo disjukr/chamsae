@@ -47,7 +47,17 @@ function JoinRoom() {
     },
   });
   return (
-    <div class="inline-flex gap-2">
+    <form
+      class="inline-flex gap-2"
+      onSubmit={(e) => {
+        e.preventDefault();
+        send({
+          t: "join-room-request",
+          requestId: "",
+          roomId: roomIdToJoinSignal.value,
+        });
+      }}
+    >
       <input
         class="border text-center"
         placeholder="방 코드"
@@ -59,17 +69,9 @@ function JoinRoom() {
             .replaceAll("1", "I")
             .toUpperCase()}
       />
-      <button
-        class="p-2 border"
-        onClick={() =>
-          send({
-            t: "join-room-request",
-            requestId: "",
-            roomId: roomIdToJoinSignal.value,
-          })}
-      >
+      <button class="p-2 border">
         참여하기
       </button>
-    </div>
+    </form>
   );
 }
