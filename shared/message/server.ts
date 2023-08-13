@@ -1,7 +1,7 @@
 import { Type } from "npm:@sinclair/typebox";
 import model from "../model.ts";
 import { User } from "../user.ts";
-import { Room, RoomUser } from "../room.ts";
+import { JoinRoomResult, Room, RoomUser } from "../room.ts";
 
 export const Noop = model(
   Type.Object({
@@ -18,9 +18,9 @@ export const Hello = model(
   }),
 );
 
-export const NicknameUpdated = model(
+export const NicknameChanged = model(
   Type.Object({
-    t: Type.Literal("nickname-updated"),
+    t: Type.Literal("nickname-changed"),
     connId: Type.String(),
     nickname: Type.String(),
   }),
@@ -41,18 +41,7 @@ export const JoinRoomResponse = model(
   Type.Object({
     t: Type.Literal("join-room-response"),
     requestId: Type.String(),
-    result: Type.Union([
-      Type.Object({
-        success: Type.Literal(true),
-        room: Room.schema,
-      }),
-      Type.Object({
-        success: Type.Literal(false),
-        reason: Type.Union([
-          Type.Literal("not-found"),
-        ]),
-      }),
-    ]),
+    result: JoinRoomResult.schema,
   }),
 );
 
@@ -70,14 +59,23 @@ export const UserLeftFromRoom = model(
   }),
 );
 
+export const Ready = model(
+  Type.Object({
+    t: Type.Literal("ready"),
+    connId: Type.String(),
+    ready: Type.Boolean(),
+  }),
+);
+
 export const ServerMessage = model(
   Type.Union([
     Noop.schema,
     Hello.schema,
-    NicknameUpdated.schema,
+    NicknameChanged.schema,
     CreateRoomResponse.schema,
     JoinRoomResponse.schema,
     UserJoinedToRoom.schema,
     UserLeftFromRoom.schema,
+    Ready.schema,
   ], { discriminator: { propertyName: "t" } }),
 );

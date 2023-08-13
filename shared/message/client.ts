@@ -7,9 +7,9 @@ export const Noop = model(
   }),
 );
 
-export const UpdateNickname = model(
+export const ChangeNickname = model(
   Type.Object({
-    t: Type.Literal("update-nickname"),
+    t: Type.Literal("change-nickname"),
     nickname: Type.String(),
   }),
 );
@@ -29,11 +29,19 @@ export const JoinRoomRequest = model(
   }),
 );
 
+export const Ready = model(
+  Type.Object({
+    t: Type.Literal("ready"),
+    ready: Type.Boolean(),
+  }),
+);
+
 export const ClientMessage = model(
   Type.Union([
     Noop.schema,
-    UpdateNickname.schema,
+    ChangeNickname.schema,
     CreateRoomRequest.schema,
     JoinRoomRequest.schema,
+    Ready.schema,
   ], { discriminator: { propertyName: "t" } }),
 );

@@ -1,7 +1,8 @@
 import { ClientMessage } from "../shared/message/client.ts";
+import { addArrayItem, removeArrayItem } from "../shared/misc/array.ts";
 import { Model } from "../shared/model.ts";
-import { getConnId, getStore, send } from "./connection/mod.ts";
-import { broadcast, createRoom, joinRoom, whichRoom } from "./room.ts";
+import { getStore, send } from "./connection/mod.ts";
+import { broadcast, createRoom, getRoom, joinRoom, whichRoom } from "./room.ts";
 
 type ClientMessageType = Model<typeof ClientMessage>["t"];
 interface Context {
@@ -21,18 +22,17 @@ export type Handler = (
 
 const handlers: Handlers = {
   "noop": () => {},
-  "update-nickname": ({ nickname }, { socket, connId }) => {
+  "change-nickname": ({ nickname }, { socket, connId }) => {
     const store = getStore(socket)!;
     store.nickname = nickname;
     const roomId = whichRoom(connId);
     if (roomId) {
-      broadcast(roomId, { t: "nickname-updated", connId, nickname });
+      broadcast(roomId, { t: "nickname-changed", connId, nickname });
     } else {
-      send(socket, { t: "nickname-updated", connId, nickname });
+      send(socket, { t: "nickname-changed", connId, nickname });
     }
   },
-  "create-room-request": ({ requestId }, { socket }) => {
-    const connId = getConnId(socket)!;
+  "create-room-request": ({ requestId }, { socket, connId }) => {
     send(socket, {
       t: "create-room-response",
       requestId,
@@ -45,6 +45,18 @@ const handlers: Handlers = {
       requestId,
       result: joinRoom(connId, roomId),
     });
+  },
+  "ready": ({ ready }, { connId }) => {
+    const roomId = whichRoom(connId);
+    if (!roomId) return;
+    const room = getRoom(roomId)!;
+    if (room.phase.t !== "waiting") return;
+    if (ready) {
+      addArrayItem(room.phase.readyUsers, connId);
+    } else {
+      removeArrayItem(room.phase.readyUsers, connId);
+    }
+    broadcast(roomId, { t: "ready", connId, ready });
   },
 };
 export default handlers;

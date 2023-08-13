@@ -19,14 +19,14 @@ export default function Setup() {
       usersSignal.value = { ...usersSignal.value, [myConnId]: me };
       connectingSignal.value = false;
     },
-    "nickname-updated"({ connId, nickname }) {
+    "nickname-changed"({ connId, nickname }) {
       const user = usersSignal.value[connId];
       if (!user) return;
       usersSignal.value = { [connId]: { ...user, nickname } };
       screenSignal.value = "main";
     },
   });
-  return connecting ? <Connecting /> : <UpdateNickname />;
+  return connecting ? <Connecting /> : <ChangeNickname />;
 }
 
 function Connecting() {
@@ -37,7 +37,7 @@ function Connecting() {
   );
 }
 
-function UpdateNickname() {
+function ChangeNickname() {
   const newNicknameSignal = useSignal(nicknameSignal.value);
   return (
     <div class="w-full h-full flex flex-col gap-4 items-center justify-center">
@@ -48,7 +48,7 @@ function UpdateNickname() {
           onSubmit={(e) => {
             e.preventDefault();
             navigator.maxTouchPoints && triggerFullscreen();
-            send({ t: "update-nickname", nickname: newNicknameSignal.value });
+            send({ t: "change-nickname", nickname: newNicknameSignal.value });
           }}
         >
           별명:{" "}
