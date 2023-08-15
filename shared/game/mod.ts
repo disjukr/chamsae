@@ -24,10 +24,18 @@ export function sortTiles<T extends Tile[]>(tiles: T): T {
   return result;
 }
 
-export function groupTiles(tiles: Tile[]): Tile[][] {
-  const table: { [number: number]: Tile[] } = {};
-  for (const tile of tiles) (table[getNumber(tile)] ||= []).push(tile);
-  return Object.values(table);
+export interface TileGroup {
+  [number: number]: Tile[];
+}
+export function groupTiles(tiles: Tile[]): TileGroup {
+  const group: TileGroup = {};
+  for (const tile of tiles) (group[getNumber(tile)] ||= []).push(tile);
+  return group;
+}
+
+export function isYaochuuhai(tile: Tile): boolean {
+  const number = getNumber(tile);
+  return (number <= 1) || (number >= 9);
 }
 
 export function isGreen(tile: Tile): boolean {

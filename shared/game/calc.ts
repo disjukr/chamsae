@@ -1,4 +1,12 @@
-import { getNumber, groupTiles, sortTiles, Tile } from "./mod.ts";
+import {
+  getNumber,
+  groupTiles,
+  isGreen,
+  isRed,
+  isYaochuuhai,
+  sortTiles,
+  Tile,
+} from "./mod.ts";
 
 export type CalcResult = CalcResultBonus | CalcResultYakuman;
 interface CalcResultBase {
@@ -21,9 +29,24 @@ export default function calc(
   handTiles: HandTiles,
 ): CalcResult | undefined {
   const pair = makePair(handTiles);
-  if (!pair) return undefined;
-  // TODO
-  return { pair, type: "yakuman", yakuman: "all-green" };
+  if (!pair) return;
+  if (handTiles.every(isGreen)) {
+    return { pair, type: "yakuman", yakuman: "all-green" };
+  }
+  if (handTiles.every(isYaochuuhai)) {
+    return { pair, type: "yakuman", yakuman: "chinyao" };
+  }
+  if (handTiles.every(isRed)) {
+    return { pair, type: "yakuman", yakuman: "super-red" };
+  }
+  return {
+    pair,
+    type: "bonus",
+    reds: handTiles.filter(isRed).length,
+    dora: handTiles.includes(dora),
+    tanyao: handTiles.every((tile) => !isYaochuuhai(tile)),
+    chanta: pair[0].some(isYaochuuhai) && pair[1].some(isYaochuuhai),
+  };
 }
 
 export type Body = [Tile, Tile, Tile];
@@ -33,20 +56,36 @@ export function makePair(
 ): Pair | undefined {
   const sortedTiles = sortTiles(handTiles);
   const groupedTiles = groupTiles(sortedTiles);
+  const groupedTileArray = Object.values(groupTiles);
+  // case 1: meld-meld
   if (
-    groupedTiles.length === 2 &&
-    groupedTiles[0].length === 3 &&
-    groupedTiles[1].length === 3
-  ) return groupedTiles as Pair;
-  const melded = groupedTiles.filter(
+    groupedTileArray.length === 2 &&
+    groupedTileArray[0].length === 3 &&
+    groupedTileArray[1].length === 3
+  ) return groupedTileArray as Pair;
+  // case 2: meld-chow (= chow-meld)
+  const melded = groupedTileArray.filter(
     (group) => group.length >= 3,
   )?.[0].slice(0, 3) as Body;
   if (melded) {
     const other = sortedTiles.filter((tile) => !melded.includes(tile)) as Body;
-    if (isChow(other)) return [melded, other];
+    if (!isChow(other)) return;
+    return [melded, other];
   }
-  // TODO
-  return;
+  // case 3: chow-chow
+  if ((-11 in groupedTiles) || (-10 in groupedTiles)) return; // "🀄", "🀅"
+  const smallest = sortedTiles[0];
+  const smallestNumber = getNumber(smallest);
+  if (!((smallestNumber + 1) in groupedTiles)) return;
+  if (!((smallestNumber + 2) in groupedTiles)) return;
+  const chow = [
+    smallest,
+    groupedTiles[smallestNumber + 1].shift(),
+    groupedTiles[smallestNumber + 2].shift(),
+  ] as Body;
+  const other = sortedTiles.filter((tile) => !chow.includes(tile)) as Body;
+  if (!isChow(other)) return;
+  return [chow, other];
 }
 
 export function isMeld(body: Body): boolean {
