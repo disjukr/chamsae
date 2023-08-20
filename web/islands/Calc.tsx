@@ -1,15 +1,17 @@
 import { computed, signal, useComputed, useSignal } from "@preact/signals";
 import { useLayoutEffect } from "preact/hooks";
 import { motion } from "framer-motion";
-import calc from "shared/game/calc.ts";
+import { sortTiles } from "shared/game/mod.ts";
+import calc, { isChow, isMeld, sum } from "shared/game/calc.ts";
 
 export default function Calc() {
   const fixSizedHandTiles = fixSizedHandTilesSignal.value;
   const doraTile = doraTileSignal.value;
   return (
-    <div class="flex flex-col gap-4 px-4 pb-8 mx-auto max-w-[30rem] md:max-w-[80rem]">
-      <h1 class="font-bold">
-        <span class="text-3xl">𓅪</span> 점수 계산기
+    <div class="flex flex-col gap-4 px-4 pt-2 pb-8 mx-auto max-w-[30rem] md:max-w-[80rem] overflow-x-hidden">
+      <h1 class="-ml-2 h-8 flex gap-2 items-center font-bold">
+        <img src="/tiles/🀐.svg" class="w-6" />
+        <span>점수 계산기</span>
       </h1>
       <div class="grid md:[grid-template-columns:10fr_7fr] gap-4">
         <div class="grid grid-cols-11 gap-1">
@@ -28,7 +30,19 @@ export default function Calc() {
         </div>
         <div class="flex gap-4">
           <div class="basis-0 grow-[6.5] flex flex-col gap-1">
-            <h2 class="text-xs text-[#666]">손패</h2>
+            <h2 class="flex gap-2 items-center text-xs text-[#666]">
+              <span>손패</span>
+              <button
+                class="px-2 border rounded bg-[#f8f8f8]"
+                onClick={() => {
+                  handTilesSignal.value = sortTiles(
+                    handTilesSignal.value as any,
+                  );
+                }}
+              >
+                정렬하기
+              </button>
+            </h2>
             <div class="inline-flex gap-1">
               {fixSizedHandTiles.map((tileId, i) => {
                 if (!tileId) return <Slot key={i} />;
@@ -64,7 +78,7 @@ export default function Calc() {
           });
         }).flat()}
       </div>
-      <h2 class="text-xs font-bold">계산 결과</h2>
+      <h2 class="text-xs font-bold">점수 계산</h2>
       <CalcResult />
     </div>
   );
@@ -72,22 +86,78 @@ export default function Calc() {
 
 function CalcResult() {
   const calcResult = calcResultSignal.value;
-  if (!calcResult) return <div class="text-sm">몸통 두 개를 만들어주세요</div>;
+  if (!calcResult) return <p class="text-sm">몸통 두 개를 만들어주세요</p>;
+  const meldCount = calcResult.pair.filter(isMeld).length;
+  const chowCount = calcResult.pair.filter(isChow).length;
+  const total = sum(calcResult);
   return (
-    <div>
-      <h3 class="pb-2 text-xs text-[#666]">몸통 두 개</h3>
-      <div class="grid grid-cols-2 gap-4 w-[12rem]">
-        {calcResult.pair.map((body) => {
-          return (
-            <div class="flex gap-1">
-              {body.map((tileId) => <TileShape {...getTileProps(tileId)} />)}
-            </div>
-          );
-        })}
-      </div>
+    <div class="flex flex-col gap-4">
+      <motion.div
+        class="flex flex-col gap-2"
+        initial={{ opacity: 0, x: "4rem" }}
+        animate={{ opacity: 1, x: 0 }}
+      >
+        <p class="text-xs text-[#666]">
+          {(meldCount && chowCount)
+            ? "같은패 몸통 하나 (2점), 순서대로 몸통 하나 (1점)"
+            : meldCount
+            ? "같은패 몸통 둘 (4점)"
+            : "순서대로 몸통 둘 (2점)"}
+        </p>
+        <div class="grid grid-cols-2 gap-4 w-[12rem]">
+          {calcResult.pair.map((body) => {
+            return (
+              <div class="flex gap-1">
+                {body.map((tileId) => <TileShape {...getTileProps(tileId)} />)}
+              </div>
+            );
+          })}
+        </div>
+      </motion.div>
+      {calcResult.type === "yakuman" &&
+        (
+          <motion.p
+            class="pb-2 text-xs text-[#666]"
+            initial={{ opacity: 0, x: "4rem" }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            {{
+              "all-green": "올 그린 (10점)",
+              "chinyao": "칭야오 (15점)",
+              "super-red": "슈퍼 레드 (20점)",
+            }[calcResult.yakuman]}
+          </motion.p>
+        )}
+      {calcResult.type === "bonus" && (
+        <motion.p
+          class="pb-2 text-xs text-[#666]"
+          initial={{ opacity: 0, x: "4rem" }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          {[
+            calcResult.reds &&
+            `적색패 ${calcResult.reds}개 (${calcResult.reds}점)`,
+            calcResult.dora && `도라 (1점)`,
+            calcResult.tanyao && `탕야오 (1점)`,
+            calcResult.chanta && `찬타 (2점)`,
+          ].filter(Boolean).join(", ") || "보너스 없음"}
+        </motion.p>
+      )}
+      <motion.div
+        initial={{ opacity: 0, x: "4rem" }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.6 }}
+      >
+        <h3 class="text-xs font-bold">총점</h3>
+        <p class="flex gap-2 text-xl font-bold">
+          <span>{total}점</span>
+          {(total >= 5) && <span>(화료가능)</span>}
+        </p>
+      </motion.div>
     </div>
   );
-  // TODO
 }
 
 interface Rect {
@@ -105,7 +175,7 @@ const calcResultSignal = computed(() => {
   const handTiles = handTilesSignal.value;
   const doraTile = doraTileSignal.value;
   if (handTiles.length < 6) return;
-  const result = calc(doraTile as any, handTiles as any);
+  const result = calc(handTiles as any, doraTile as any);
   return result;
 });
 

@@ -25,8 +25,8 @@ export interface CalcResultYakuman extends CalcResultBase {
 }
 export type HandTiles = [Tile, Tile, Tile, Tile, Tile, Tile];
 export default function calc(
-  dora: Tile,
   handTiles: HandTiles,
+  dora?: Tile,
 ): CalcResult | undefined {
   const pair = makePair(handTiles);
   if (!pair) return;
@@ -43,10 +43,31 @@ export default function calc(
     pair,
     type: "bonus",
     reds: handTiles.filter(isRed).length,
-    dora: handTiles.includes(dora),
+    dora: Boolean(
+      dora && handTiles.find(
+        (tile) => getNumber(tile) === getNumber(dora),
+      ),
+    ),
     tanyao: handTiles.every((tile) => !isYaochuuhai(tile)),
     chanta: pair[0].some(isYaochuuhai) && pair[1].some(isYaochuuhai),
   };
+}
+export function sum(calcResult: CalcResult): number {
+  const meldCount = calcResult.pair.filter(isMeld).length;
+  const chowCount = calcResult.pair.filter(isChow).length;
+  const pairBonus = (meldCount * 2) + chowCount;
+  if (calcResult.type === "yakuman") {
+    return pairBonus + {
+      "all-green": 10,
+      "chinyao": 15,
+      "super-red": 20,
+    }[calcResult.yakuman];
+  }
+  return pairBonus +
+    calcResult.reds +
+    Number(calcResult.dora) +
+    Number(calcResult.tanyao) +
+    (Number(calcResult.chanta) * 2);
 }
 
 export type Body = [Tile, Tile, Tile];
