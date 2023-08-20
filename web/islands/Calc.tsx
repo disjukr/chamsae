@@ -1,16 +1,17 @@
 import { computed, signal, useComputed, useSignal } from "@preact/signals";
 import { useLayoutEffect } from "preact/hooks";
 import { motion } from "framer-motion";
+import calc from "shared/game/calc.ts";
 
 export default function Calc() {
   const fixSizedHandTiles = fixSizedHandTilesSignal.value;
   const doraTile = doraTileSignal.value;
   return (
-    <div class="px-4 pb-8 mx-auto max-w-[30rem] md:max-w-[80rem]">
-      <h1 class="mb-4 font-bold">
+    <div class="flex flex-col gap-4 px-4 pb-8 mx-auto max-w-[30rem] md:max-w-[80rem]">
+      <h1 class="font-bold">
         <span class="text-3xl">𓅪</span> 점수 계산기
       </h1>
-      <div class="grid md:grid-cols-2 gap-4 select-none">
+      <div class="grid md:[grid-template-columns:10fr_7fr] gap-4">
         <div class="grid grid-cols-11 gap-1">
           {["a", "b", "c", "r"].map((line) => {
             return tiles.map((tile) => {
@@ -26,7 +27,7 @@ export default function Calc() {
           }).flat()}
         </div>
         <div class="flex gap-4">
-          <div class="grow-[10] flex flex-col gap-1">
+          <div class="basis-0 grow-[6.5] flex flex-col gap-1">
             <h2 class="text-xs text-[#666]">손패</h2>
             <div class="inline-flex gap-1">
               {fixSizedHandTiles.map((tileId, i) => {
@@ -43,7 +44,7 @@ export default function Calc() {
               })}
             </div>
           </div>
-          <div class="grow-[1] flex flex-col gap-1">
+          <div class="basis-0 grow-[1] flex flex-col gap-1">
             <h2 class="text-xs text-[#666]">도라</h2>
             {doraTile
               ? (
@@ -63,8 +64,30 @@ export default function Calc() {
           });
         }).flat()}
       </div>
+      <h2 class="text-xs font-bold">계산 결과</h2>
+      <CalcResult />
     </div>
   );
+}
+
+function CalcResult() {
+  const calcResult = calcResultSignal.value;
+  if (!calcResult) return <div class="text-sm">몸통 두 개를 만들어주세요</div>;
+  return (
+    <div>
+      <h3 class="pb-2 text-xs text-[#666]">몸통 두 개</h3>
+      <div class="grid grid-cols-2 gap-4 w-[12rem]">
+        {calcResult.pair.map((body) => {
+          return (
+            <div class="flex gap-1">
+              {body.map((tileId) => <TileShape {...getTileProps(tileId)} />)}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+  // TODO
 }
 
 interface Rect {
@@ -77,6 +100,14 @@ interface SlotRects {
   [tileId: string]: Rect;
 }
 const slotRectsSignal = signal<SlotRects>({});
+
+const calcResultSignal = computed(() => {
+  const handTiles = handTilesSignal.value;
+  const doraTile = doraTileSignal.value;
+  if (handTiles.length < 6) return;
+  const result = calc(doraTile as any, handTiles as any);
+  return result;
+});
 
 const handTilesSignal = signal<string[]>([]);
 const doraTileSignal = signal<string | undefined>(undefined);
@@ -124,10 +155,8 @@ function getTileProps(tileId: string): TileProps {
 const tiles = ["🀐", "🀑", "🀒", "🀓", "🀔", "🀕", "🀖", "🀗", "🀘", "🀅", "🀄"] as const;
 type Tile = (typeof tiles)[number];
 
-interface TileProps {
+interface TileProps extends TileShapeProps {
   tileId?: string;
-  tile: Tile;
-  red?: boolean;
 }
 const tileStyle = "absolute top-[35%] left-0 w-full h-[58%] object-contain";
 const dragonTileStyle =
@@ -136,9 +165,7 @@ const redFilter = {
   filter:
     "brightness(0) saturate(100%) invert(36%) sepia(92%) saturate(2715%) hue-rotate(321deg) brightness(91%) contrast(88%)",
 };
-function Tile({ tileId, tile, red }: TileProps) {
-  const isDragonTile = (tile === "🀄") || (tile === "🀅");
-  const tileClass = isDragonTile ? dragonTileStyle : tileStyle;
+function Tile({ tileId, ...shapeProps }: TileProps) {
   const containerClass = tileId
     ? `absolute w-full [view-transition-name:${tileId}]`
     : "absolute w-full";
@@ -159,13 +186,26 @@ function Tile({ tileId, tile, red }: TileProps) {
       onAnimationStart={() => zIndexSignal.value = 1}
       onAnimationComplete={() => zIndexSignal.value = 0}
     >
+      <TileShape {...shapeProps} />
+    </motion.div>
+  );
+}
+interface TileShapeProps {
+  tile: Tile;
+  red?: boolean;
+}
+function TileShape({ tile, red }: TileShapeProps) {
+  const isDragonTile = (tile === "🀄") || (tile === "🀅");
+  const tileClass = isDragonTile ? dragonTileStyle : tileStyle;
+  return (
+    <div class="relative">
       <img class="w-full" src="/tiles/🀆.svg" />
       <img
         class={tileClass}
         src={`/tiles/${tile}.svg`}
         style={(red && !isDragonTile) ? redFilter : undefined}
       />
-    </motion.div>
+    </div>
   );
 }
 

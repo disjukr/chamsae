@@ -56,7 +56,7 @@ export function makePair(
 ): Pair | undefined {
   const sortedTiles = sortTiles(handTiles);
   const groupedTiles = groupTiles(sortedTiles);
-  const groupedTileArray = Object.values(groupTiles);
+  const groupedTileArray = Object.values(groupedTiles);
   // case 1: meld-meld
   if (
     groupedTileArray.length === 2 &&
@@ -66,7 +66,7 @@ export function makePair(
   // case 2: meld-chow (= chow-meld)
   const melded = groupedTileArray.filter(
     (group) => group.length >= 3,
-  )?.[0].slice(0, 3) as Body;
+  )?.[0]?.slice(0, 3) as Body;
   if (melded) {
     const other = sortedTiles.filter((tile) => !melded.includes(tile)) as Body;
     if (!isChow(other)) return;
