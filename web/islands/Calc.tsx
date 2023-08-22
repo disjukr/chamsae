@@ -139,7 +139,8 @@ function CalcResult() {
           {[
             calcResult.reds &&
             `적색패 ${calcResult.reds}개 (${calcResult.reds}점)`,
-            calcResult.dora && `도라 (1점)`,
+            calcResult.dora &&
+            `도라 ${calcResult.dora}개 (${calcResult.dora}점)`,
             calcResult.tanyao && `탕야오 (1점)`,
             calcResult.chanta && `찬타 (2점)`,
           ].filter(Boolean).join(", ") || "보너스 없음"}

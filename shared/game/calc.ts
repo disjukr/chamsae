@@ -15,7 +15,7 @@ interface CalcResultBase {
 export interface CalcResultBonus extends CalcResultBase {
   type: "bonus";
   reds: number;
-  dora: boolean;
+  dora: number;
   tanyao: boolean;
   chanta: boolean;
 }
@@ -43,11 +43,11 @@ export default function calc(
     pair,
     type: "bonus",
     reds: handTiles.filter(isRed).length,
-    dora: Boolean(
-      dora && handTiles.find(
+    dora: dora
+      ? handTiles.filter(
         (tile) => getNumber(tile) === getNumber(dora),
-      ),
-    ),
+      ).length
+      : 0,
     tanyao: handTiles.every((tile) => !isYaochuuhai(tile)),
     chanta: pair[0].some(isYaochuuhai) && pair[1].some(isYaochuuhai),
   };
@@ -65,7 +65,7 @@ export function sum(calcResult: CalcResult): number {
   }
   return pairBonus +
     calcResult.reds +
-    Number(calcResult.dora) +
+    calcResult.dora +
     Number(calcResult.tanyao) +
     (Number(calcResult.chanta) * 2);
 }
