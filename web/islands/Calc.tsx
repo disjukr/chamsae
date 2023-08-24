@@ -29,6 +29,16 @@ export default function Calc() {
           }).flat()}
         </div>
         <div class="flex gap-4">
+          <div class="basis-0 grow-[1] flex flex-col gap-1">
+            <h2 class="text-xs text-[#666]">도라</h2>
+            {doraTile
+              ? (
+                <button onClick={() => setDoraTile(undefined)}>
+                  <Slot tileId={doraTile} />
+                </button>
+              )
+              : <Slot />}
+          </div>
           <div class="basis-0 grow-[6.5] flex flex-col gap-1">
             <h2 class="flex gap-2 items-center text-xs text-[#666]">
               <span>손패</span>
@@ -57,16 +67,6 @@ export default function Calc() {
                 );
               })}
             </div>
-          </div>
-          <div class="basis-0 grow-[1] flex flex-col gap-1">
-            <h2 class="text-xs text-[#666]">도라</h2>
-            {doraTile
-              ? (
-                <button onClick={() => setDoraTile(undefined)}>
-                  <Slot tileId={doraTile} />
-                </button>
-              )
-              : <Slot />}
           </div>
         </div>
       </div>
@@ -194,11 +194,9 @@ function inHandOrDora(tileId: string): boolean {
 }
 
 function addHandOrSetDora(tileId: string) {
-  const handTiles = handTilesSignal.value;
   const doraTile = doraTileSignal.value;
-  if (doraTile) return addHandTile(tileId);
-  if (handTiles.length < 6) return addHandTile(tileId);
-  setDoraTile(tileId);
+  if (!doraTile) return setDoraTile(tileId);
+  return addHandTile(tileId);
 }
 
 function addHandTile(tileId: string) {
