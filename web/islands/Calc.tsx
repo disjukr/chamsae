@@ -201,8 +201,9 @@ function addHandOrSetDora(tileId: string) {
 
 function addHandTile(tileId: string) {
   const handTiles = handTilesSignal.value;
-  const newTiles = [tileId, ...handTiles];
-  if (newTiles.length > 6) newTiles.length = 6;
+  const newTiles = handTiles.slice();
+  newTiles.push(tileId);
+  while (newTiles.length > 6) newTiles.shift();
   handTilesSignal.value = newTiles;
 }
 
