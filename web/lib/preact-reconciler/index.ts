@@ -9,20 +9,6 @@ import {
   type VNode,
 } from "preact";
 
-const _customElements = IS_BROWSER ? customElements : { define() {} };
-const _HTMLElement = IS_BROWSER ? HTMLElement : class {
-  appendChild(): any {}
-  removeChild(): any {}
-  insertBefore(): any {}
-} as any as { new (): HTMLElement };
-
-interface FiberNode<T = any> extends HTMLElement {
-  ownerSVGElement?: null;
-  fiber?: Fiber;
-  containerInfo: T;
-  hostConfig: HostConfig;
-}
-
 export interface Fiber<P = any, I = any, R = any> extends VNode<P> {
   __c?: Component & {
     __P: FiberNode<R>;
@@ -107,6 +93,17 @@ export interface HostConfig<
   [name: string]: unknown;
 }
 
+const _HTMLElement = IS_BROWSER ? HTMLElement : class {
+  appendChild(): any {}
+  removeChild(): any {}
+  insertBefore(): any {}
+} as any as { new (): HTMLElement };
+interface FiberNode<T = any> extends HTMLElement {
+  ownerSVGElement?: null;
+  fiber?: Fiber;
+  containerInfo: T;
+  hostConfig: HostConfig;
+}
 class FiberNode extends _HTMLElement {
   setAttribute(name: string, value: any): void {
     (this as Record<string, unknown>)[name] = value;
@@ -264,7 +261,7 @@ let id!: string;
 function init() {
   if (id) return;
   if (!IS_BROWSER) return;
-  _customElements.define(id = "preact-reconciler", FiberNode);
+  customElements.define(id = "preact-reconciler", FiberNode);
   const DIFF = options.__b;
   options.__b = (vnode) => {
     const fiber = vnode as Partial<Fiber>;

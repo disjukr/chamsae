@@ -7,7 +7,9 @@ export default function Page() {
       <Head>
         <title>r3f-test</title>
       </Head>
-      <R3fTest />
+      <div class="w-full h-[100vh]">
+        <R3fTest />
+      </div>
     </>
   );
 }

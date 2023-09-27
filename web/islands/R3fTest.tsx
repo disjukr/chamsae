@@ -1,5 +1,6 @@
 import { useRef, useState } from "preact/hooks";
 import { Canvas, useFrame } from "@react-three/fiber";
+import { RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
 import NoSsr from "../misc/NoSsr.ts";
 
@@ -7,9 +8,18 @@ export default function R3fTest() {
   return (
     <NoSsr>
       <Canvas>
-        <ambientLight />
-        <pointLight position={[10, 10, 10]} />
-        <Box position={[-1.2, 0, 0]} />
+        <color args={[0xabcdef]} attach="background" />
+        <ambientLight intensity={0.5} />
+        <directionalLight position={[1, 1, 1]} intensity={1} />
+        <directionalLight position={[-1, -2, -3]} intensity={0.5} />
+        <RoundedBox
+          position={[-1.2, 0, 0]}
+          bevelSegments={1}
+          smoothness={1}
+          radius={0.1}
+        >
+          <meshStandardMaterial color={"orange"} />
+        </RoundedBox>
         <Box position={[1.2, 0, 0]} />
       </Canvas>
     </NoSsr>
