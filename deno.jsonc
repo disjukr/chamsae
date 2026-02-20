@@ -1,9 +1,0 @@
-{
-  "lock": false,
-  "tasks": {
-    "gameserver:dev": "cd gameserver && deno task dev",
-    "gameserver:debug": "cd gameserver && deno task debug",
-    "gameserver:start": "cd gameserver && deno task start",
-    "web:dev": "cd web && deno task dev"
-  }
-}

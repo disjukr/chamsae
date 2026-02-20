@@ -1,8 +1,0 @@
-{
-  "lock": false,
-  "tasks": {
-    "dev": "deno run -A --unstable --watch ./main.ts",
-    "debug": "deno run -A --unstable --inspect-brk ./main.ts",
-    "start": "deno run -A --unstable ./main.ts"
-  }
-}
