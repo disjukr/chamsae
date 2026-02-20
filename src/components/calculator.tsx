@@ -30,6 +30,22 @@ const tileIds = ["a", "b", "c", "r"].flatMap((line) =>
   tileFaces.map((face) => `${line}${face}` as Tile)
 );
 
+const resultContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      delayChildren: 0.1,
+      staggerChildren: 0.2,
+    },
+  },
+};
+
+const resultItemVariants = {
+  hidden: { opacity: 0, x: "2rem" },
+  visible: { opacity: 1, x: 0 },
+};
+
 function toHandTiles(tiles: Tile[]): HandTiles | undefined {
   if (tiles.length !== 6) {
     return undefined;
@@ -196,8 +212,14 @@ export default function Calculator() {
       {!result ? (
         <p>몸통 두 개를 만들어주세요</p>
       ) : (
-        <div className="result-box">
-          <motion.div initial={{ opacity: 0, x: "2rem" }} animate={{ opacity: 1, x: 0 }}>
+        <motion.div
+          className="result-box"
+          variants={resultContainerVariants}
+          initial="hidden"
+          animate="visible"
+          key={`${result.type}-${result.pair.flat().join("-")}`}
+        >
+          <motion.div variants={resultItemVariants}>
             <p className="meta">
               {(() => {
                 const meldCount = result.pair.filter(isMeld).length;
@@ -219,7 +241,7 @@ export default function Calculator() {
           </motion.div>
 
           {result.type === "yakuman" ? (
-            <motion.p initial={{ opacity: 0, x: "2rem" }} animate={{ opacity: 1, x: 0 }}>
+            <motion.p variants={resultItemVariants}>
               {{
                 "all-green": "올 그린 (10점)",
                 chinyao: "칭야오 (15점)",
@@ -227,7 +249,7 @@ export default function Calculator() {
               }[result.yakuman]}
             </motion.p>
           ) : (
-            <motion.p initial={{ opacity: 0, x: "2rem" }} animate={{ opacity: 1, x: 0 }}>
+            <motion.p variants={resultItemVariants}>
               {[
                 result.reds ? `적색패 ${result.reds}개 (${result.reds}점)` : "",
                 result.dora ? `도라 ${result.dora}개 (${result.dora}점)` : "",
@@ -237,13 +259,13 @@ export default function Calculator() {
             </motion.p>
           )}
 
-          <motion.div initial={{ opacity: 0, x: "2rem" }} animate={{ opacity: 1, x: 0 }}>
+          <motion.div variants={resultItemVariants}>
             <p className="section-title" style={{ marginTop: 0 }}>총점</p>
             <p className="score">
               {sum(result)}점 {sum(result) >= 5 ? "(화료가능)" : ""}
             </p>
           </motion.div>
-        </div>
+        </motion.div>
       )}
     </main>
   );
