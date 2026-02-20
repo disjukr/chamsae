@@ -3,14 +3,16 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import calc, {
+import {
+  calc,
   type Body,
   type HandTiles,
   isChow,
   isMeld,
   sum,
-} from "@/lib/game/calc";
-import { sortTiles, type Tile } from "@/lib/game/mod";
+  sortTiles,
+  type Tile,
+} from "@chamsae/core/game";
 
 const tileFaces = [
   "🀐",

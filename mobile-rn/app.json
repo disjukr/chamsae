@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "참새작 점수계산기",
+    "slug": "chamsae-score-calculator",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "plugins": [
+      "expo-asset"
+    ]
+  }
+}

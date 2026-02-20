@@ -7,3 +7,6 @@ pnpm-debug.log*
 coverage/
 dist/
 *.tsbuildinfo
+.expo/
+packages/mobile-rn/.expo/
+packages/web-next/.next/
